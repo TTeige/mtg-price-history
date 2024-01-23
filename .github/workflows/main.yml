@@ -39,7 +39,7 @@ jobs:
 
       - name: Create price transformer lambda
         run: |
-          cd raw_data_load 
+          cd price_transformer 
           mkdir package 
           pip install --target ./package -r requirements.txt 
           cd package 
