@@ -33,4 +33,5 @@ jobs:
         run: |
           cd raw_data_loader
           docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG -t $REGISTRY/$REPOSITORY:$LATEST .
-          docker push -a $REGISTRY/$REPOSITORY
+          docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
+          docker push $REGISTRY/$REPOSITORY:$LATEST
