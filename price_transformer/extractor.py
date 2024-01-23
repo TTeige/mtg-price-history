@@ -19,7 +19,7 @@ def extract_data(event=None, context=None):
     price_data = defaultdict(dict)  # Key is card_name and data is array of full objects as cards
     object_key = None
     for record in event["Records"]:
-        object_key = record[0]["s3"]["object"]["key"]
+        object_key = record["s3"]["object"]["key"]
     if object_key is None:
         return
 
