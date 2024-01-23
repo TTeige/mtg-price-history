@@ -1,0 +1,5 @@
+*.iml
+.idea/
+raw_card_data/
+transformed_card_data/
+venv/
