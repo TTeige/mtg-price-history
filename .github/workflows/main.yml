@@ -23,12 +23,12 @@ jobs:
 
       - name: Build raw data loader lambda
         run: |
-          cd raw_data_loader \
-          mkdir package \
-          pip install --target ./package -r requirements.txt \
-          cd package \
-          zip -r ../raw_data_loader.zip . \
-          cd .. \
+          cd raw_data_loader && \
+          mkdir package && \
+          pip install --target ./package -r requirements.txt && \
+          cd package && \
+          zip -r ../raw_data_loader.zip . && \
+          cd .. && \
           zip raw_data_loader.zip card_fetcher.py
 
       - name: Deploy raw data loader
