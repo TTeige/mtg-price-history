@@ -18,6 +18,7 @@ def build_new_price_object(c):
 def extract_data(event=None, context=None):
     price_data = defaultdict(dict)  # Key is card_name and data is array of full objects as cards
     object_key = None
+    print(f"Received event with {len(event['Records'])} number of records")
     for record in event["Records"]:
         object_key = record["s3"]["object"]["key"]
     if object_key is None:
@@ -37,6 +38,7 @@ def extract_data(event=None, context=None):
     f_out_date_string = object_key.split("-")[-1].split(".")[0]
     year, month, day, hour = f_out_date_string[0:4], f_out_date_string[4:6], f_out_date_string[6:8], f_out_date_string[
                                                                                                      8:10]
+    print(f"Found {len(price_data.keys())} number of cards")
     f_out = f"prices/price_data_{year}-{month}-{day}-{hour}.json"
 
     s3_client.put_object(
