@@ -1,6 +1,6 @@
 *.iml
 .idea/
-raw_card_data/
+raw-data/
 transformed_card_data/
 venv/
 /single.json
