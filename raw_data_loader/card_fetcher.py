@@ -33,10 +33,8 @@ def fetch_card_data(event=None, context=None):
         resp = s3_client.put_object(Body=resp.json(), Bucket="mtg-pricing-data", Key=fp)
     else:
         print("Writing to disk")
-        with open(fp, "w") as f:
+        with open(f"../{fp}", "w") as f:
             json.dump(resp.json(), f)
-
-        print(os.stat(fp))
 
     return fp
 

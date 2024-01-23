@@ -21,15 +21,15 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: eu-north-1
 
-      - name: Build raw data loader lambda
-        run: |
-          cd raw_data_loader && \
-          mkdir package && \
-          pip install --target ./package -r requirements.txt && \
-          cd package && \
-          zip -r ../raw_data_loader.zip . && \
-          cd .. && \
-          zip raw_data_loader.zip card_fetcher.py
+      - name: Login ecr
+        uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Deploy raw data loader
-        run: aws lambda update-function-code --function-name extract-raw-data --zip-file fileb://raw_data_loader/raw_data_loader.zip
+      - name: Build and deploy
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REPOSITORY: mtg-pricing
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          cd raw_data_loader
+          docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
+          docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
