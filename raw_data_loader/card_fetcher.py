@@ -30,7 +30,7 @@ def fetch_card_data(event=None, context=None):
     if local is None and not local:
         print("Writing to s3")
         s3_client = client("s3")
-        resp = s3_client.put_object(Body=resp.json(), Bucket="mtg-pricing-data", Key=fp)
+        resp = s3_client.put_object(Body=json.dumps(resp.json()), Bucket="mtg-pricing-data", Key=fp)
     else:
         print("Writing to disk")
         with open(f"../{fp}", "w") as f:
