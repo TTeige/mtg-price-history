@@ -32,6 +32,6 @@ jobs:
           IMAGE_TAG: ${{ github.sha }}
         run: |
           cd raw_data_loader
-          docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG -t $REGISTRY/$REPOSITORY:$$LATEST .
+          docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG -t $REGISTRY/$REPOSITORY:latest .
           docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
-          docker push $REGISTRY/$REPOSITORY:$$LATEST
+          docker push $REGISTRY/$REPOSITORY:latest
