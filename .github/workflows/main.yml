@@ -35,3 +35,19 @@ jobs:
           docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG -t $REGISTRY/$REPOSITORY:latest .
           docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
           docker push $REGISTRY/$REPOSITORY:latest
+          cd ..
+
+      - name: Create price transformer lambda
+        run: |
+          cd raw_data_load 
+          mkdir package 
+          pip install --target ./package -r requirements.txt 
+          cd package 
+          zip -r ../price_transformer.zip . 
+          cd .. 
+          zip price_transformer.zip extractor.py
+          cd ..
+
+      - name: Deploy price transformer lambda
+        run: |
+          aws lambda update-function-code --function-name TransformPriceData

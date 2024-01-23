@@ -1,5 +1,5 @@
 from raw_data_loader.card_fetcher import fetch_card_data
-from extractor import extract_data
+from price_transformer.extractor import extract_data
 
 
 def run():
