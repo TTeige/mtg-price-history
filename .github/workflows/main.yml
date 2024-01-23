@@ -32,8 +32,7 @@ jobs:
           IMAGE_TAG: ${{ github.sha }}
         run: |
           cd raw_data_loader
-          docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG -t $REGISTRY/$REPOSITORY:latest .
-          docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
+          docker build -t $REGISTRY/$REPOSITORY:latest .
           docker push $REGISTRY/$REPOSITORY:latest
           cd ..
 
@@ -50,4 +49,4 @@ jobs:
 
       - name: Deploy price transformer lambda
         run: |
-          aws lambda update-function-code --function-name TransformPriceData
+          aws lambda update-function-code --function-name TransformPriceData --zip-file fileb://price_transformer/price_transformer.zip
