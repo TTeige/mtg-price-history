@@ -22,6 +22,7 @@ jobs:
           aws-region: eu-north-1
 
       - name: Login ecr
+        id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
       - name: Build and deploy
