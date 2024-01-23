@@ -1,4 +1,4 @@
-from card_fetcher import fetch_card_data
+from raw_data_loader.card_fetcher import fetch_card_data
 from extractor import extract_data
 
 
