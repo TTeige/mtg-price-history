@@ -32,4 +32,4 @@ jobs:
           zip raw_data_loader.zip card_fetcher.py
 
       - name: Deploy raw data loader
-        run: aws lambda update-function-code --function-name extract-raw-data --zip-file raw_data_loader/raw_data_loader.zip
+        run: aws lambda update-function-code --function-name extract-raw-data --zip-file fileb://raw_data_loader/raw_data_loader.zip
