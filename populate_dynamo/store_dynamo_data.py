@@ -26,11 +26,11 @@ def export_dynamodb(dynamodb_client, card, object_key):
             "date": {"S": object_key.split("_")[-1].split(".")[0]},
             "set": {"S": card["set"]},
             "set_name": {"S": card["set_name"]},
-            "usd": {"N": card["prices"]["usd"]},
-            "usd_foil": {"N": card["prices"]["usd_foil"]},
-            "eur": {"N": card["prices"]["eur"]},
-            "eur_foil": {"N": card["prices"]["eur_foil"]},
-            "usd_etched": {"N": card["prices"]["usd_etched"]},
+            "usd": {"S": card["prices"]["usd"]},
+            "usd_foil": {"S": card["prices"]["usd_foil"]},
+            "eur": {"S": card["prices"]["eur"]},
+            "eur_foil": {"S": card["prices"]["eur_foil"]},
+            "usd_etched": {"S": card["prices"]["usd_etched"]},
         }
     )
 
