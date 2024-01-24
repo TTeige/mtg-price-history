@@ -60,4 +60,4 @@ jobs:
       - name: Deploy price transformer lambda
         run: |
           aws lambda update-function-code --function-name TransformPriceData --zip-file fileb://price_transformer/price_transformer.zip
-          aws lambda update-function-code --function-name TransferToDynamo --zip-file fileb://price_transformer/dynamo.zip
+          aws lambda update-function-code --function-name TransferToDynamo --zip-file fileb://populate_dynamo/dynamo.zip
