@@ -18,6 +18,10 @@ def get_object_key(event):
     return object_key
 
 
+def default_to_string(v):
+    return "" if v is None else v
+
+
 def export_dynamodb(dynamodb_client, card, object_key):
     dynamodb_client.put_item(
         TableName="pricing_data",
@@ -26,11 +30,11 @@ def export_dynamodb(dynamodb_client, card, object_key):
             "date": {"S": object_key.split("_")[-1].split(".")[0]},
             "set": {"S": card["set"]},
             "set_name": {"S": card["set_name"]},
-            "usd": {"S": "" if card["prices"]["usd"] is None else card["prices"]["usd"]},
-            "usd_foil": {"S": "" if card["prices"]["usd_foil"] is None else card["prices"]["usd_foil"]},
-            "eur": {"S": "" if card["prices"]["eur"] is None else card["prices"]["eur"]},
-            "eur_foil": {"S": "" if card["prices"]["eur_foil"] is None else card["prices"]["eur_foil"]},
-            "usd_etched": {"S": "" if card["prices"]["usd_etched"] is None else card["prices"]["usd_etched"]},
+            "usd": {"S": default_to_string(card["prices"]["usd"])},
+            "usd_foil": {"S": default_to_string(card["prices"]["usd_foil"])},
+            "eur": {"S": default_to_string(card["prices"]["eur"])},
+            "eur_foil": {"S": default_to_string(card["prices"]["eur_foil"])},
+            "usd_etched": {"S": default_to_string(card["prices"]["usd_etched"])},
         }
     )
 
