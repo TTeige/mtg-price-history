@@ -1,4 +1,4 @@
-from python:3
+from python:3.12-slim
 
 ADD card_fetcher.py .
 ADD requirements.txt .
