@@ -5,7 +5,8 @@ from boto3 import client
 
 def load_from_s3(object_key):
     s3_client = client('s3')
-    return json.loads(s3_client.get_object(Bucket="mtg-pricing-data", Key=object_key)["Body"])
+    resp = s3_client.get_object(Bucket="mtg-pricing-data", Key=object_key)
+    return json.loads(resp["Body"])
 
 
 def get_object_key(event):
