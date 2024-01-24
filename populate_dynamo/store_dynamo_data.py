@@ -22,15 +22,15 @@ def export_dynamodb(dynamodb_client, card, object_key):
     dynamodb_client.put_item(
         TableName="pricing_data",
         Item={
-            "multiverse_id": {"S": card["multiverse_ids"][0]},
+            "multiverse_id": {"N": card["multiverse_ids"][0]},
             "date": {"S": object_key.split("_")[-1].split(".")[0]},
             "set": {"S": card["set"]},
             "set_name": {"S": card["set_name"]},
-            "usd": {"S": card["prices"]["usd"]},
-            "usd_foil": {"S": card["prices"]["usd_foil"]},
-            "eur": {"S": card["prices"]["eur"]},
-            "eur_foil": {"S": card["prices"]["eur_foil"]},
-            "usd_etched": {"S": card["prices"]["usd_etched"]},
+            "usd": {"N": card["prices"]["usd"]},
+            "usd_foil": {"N": card["prices"]["usd_foil"]},
+            "eur": {"N": card["prices"]["eur"]},
+            "eur_foil": {"N": card["prices"]["eur_foil"]},
+            "usd_etched": {"N": card["prices"]["usd_etched"]},
         }
     )
 
