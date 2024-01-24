@@ -46,7 +46,18 @@ jobs:
           cd .. 
           zip price_transformer.zip extractor.py
           cd ..
+      - name: Create price transformer lambda
+        run: |
+          cd populate_dynamo 
+          mkdir package 
+          pip install --target ./package -r requirements.txt 
+          cd package 
+          zip -r ../dynamo.zip . 
+          cd .. 
+          zip dynamo.zip store_dynamo_data.py
+          cd ..
 
       - name: Deploy price transformer lambda
         run: |
           aws lambda update-function-code --function-name TransformPriceData --zip-file fileb://price_transformer/price_transformer.zip
+          aws lambda update-function-code --function-name TransferToDynamo --zip-file fileb://price_transformer/dynamo.zip
