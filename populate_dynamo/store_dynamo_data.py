@@ -23,6 +23,9 @@ def default_to_string(v):
 
 
 def export_dynamodb(dynamodb_client, card, object_key):
+    if len(card["multiverse_ids"]) != 1:
+        print(f"No multiverse id for card: {card['name']} - {card['set_name']}")
+        return
     dynamodb_client.put_item(
         TableName="pricing_data",
         Item={
