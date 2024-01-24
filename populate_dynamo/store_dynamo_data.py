@@ -22,7 +22,7 @@ def export_dynamodb(dynamodb_client, card, object_key):
     dynamodb_client.put_item(
         TableName="pricing_data",
         Item={
-            "multiverse_id": {"N": card["multiverse_ids"][0]},
+            "multiverse_id": {"S": str(card["multiverse_ids"][0])},
             "date": {"S": object_key.split("_")[-1].split(".")[0]},
             "set": {"S": card["set"]},
             "set_name": {"S": card["set_name"]},
