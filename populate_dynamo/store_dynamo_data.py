@@ -69,7 +69,7 @@ def handle_event(event, context):
     for i, chunk in enumerate(items_to_export):
         print(f"Sending chunk number: {i}")
         resp = dynamodb_client.batch_write_item(
-            RequestItem={
+            RequestItems={
                 "pricing_data": chunk
             }
         )
