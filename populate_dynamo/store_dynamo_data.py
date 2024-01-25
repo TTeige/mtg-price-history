@@ -36,27 +36,41 @@ def handle_event(event, context):
 
     items_to_export = []
 
+    print(f"Found {len(data.keys())} card names, uploading all")
+
+    i = 0
+
     for c_name, sets in data.items():
         for set_name, card in sets.items():
             if len(card["multiverse_ids"]) != 1:
                 print(f"No multiverse id for card: {card['name']} - {card['set_name']}")
                 return
+            i += 1
             items_to_export.append(
                 {
-                    "multiverse_id": {"S": str(card["multiverse_ids"][0])},
-                    "date": {"S": object_key.split("_")[-1].split(".")[0]},
-                    "set": {"S": card["set"]},
-                    "set_name": {"S": card["set_name"]},
-                    "usd": {"S": default_to_string(card["prices"]["usd"])},
-                    "usd_foil": {"S": default_to_string(card["prices"]["usd_foil"])},
-                    "eur": {"S": default_to_string(card["prices"]["eur"])},
-                    "eur_foil": {"S": default_to_string(card["prices"]["eur_foil"])},
-                    "usd_etched": {"S": default_to_string(card["prices"]["usd_etched"])},
+                    "PutRequest": {
+                        "Item": {
+                            "multiverse_id": {"S": str(card["multiverse_ids"][0])},
+                            "date": {"S": object_key.split("_")[-1].split(".")[0]},
+                            "set": {"S": card["set"]},
+                            "set_name": {"S": card["set_name"]},
+                            "usd": {"S": default_to_string(card["prices"]["usd"])},
+                            "usd_foil": {"S": default_to_string(card["prices"]["usd_foil"])},
+                            "eur": {"S": default_to_string(card["prices"]["eur"])},
+                            "eur_foil": {"S": default_to_string(card["prices"]["eur_foil"])},
+                            "usd_etched": {"S": default_to_string(card["prices"]["usd_etched"])},
+                        }
+                    }
                 }
             )
+    print(f"Found {i} cards in the file, sending all to dynamodb")
     items_to_export = chunk_list(items_to_export, 25)
-    for chunk in items_to_export:
-        dynamodb_client.put_item(
-            TableName="pricing_data",
-            Items=chunk
+    print(f"Sending chunks")
+    for i, chunk in enumerate(items_to_export):
+        print(f"Sending chunk number: {i}")
+        dynamodb_client.batch_write_item(
+            RequestItem={
+                "pricing_data": chunk
+            }
         )
+        print("Success for chunk")
