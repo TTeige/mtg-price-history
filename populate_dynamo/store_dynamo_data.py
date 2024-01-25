@@ -22,24 +22,9 @@ def default_to_string(v):
     return "" if v is None else v
 
 
-def export_dynamodb(dynamodb_client, card, object_key):
-    if len(card["multiverse_ids"]) != 1:
-        print(f"No multiverse id for card: {card['name']} - {card['set_name']}")
-        return
-    dynamodb_client.put_item(
-        TableName="pricing_data",
-        Item={
-            "multiverse_id": {"S": str(card["multiverse_ids"][0])},
-            "date": {"S": object_key.split("_")[-1].split(".")[0]},
-            "set": {"S": card["set"]},
-            "set_name": {"S": card["set_name"]},
-            "usd": {"S": default_to_string(card["prices"]["usd"])},
-            "usd_foil": {"S": default_to_string(card["prices"]["usd_foil"])},
-            "eur": {"S": default_to_string(card["prices"]["eur"])},
-            "eur_foil": {"S": default_to_string(card["prices"]["eur_foil"])},
-            "usd_etched": {"S": default_to_string(card["prices"]["usd_etched"])},
-        }
-    )
+def chunk_list(l, chunk_size):
+    for i in range(0, len(l), chunk_size):
+        yield l[i:i + chunk_size]
 
 
 def handle_event(event, context):
@@ -49,6 +34,29 @@ def handle_event(event, context):
 
     dynamodb_client = client('dynamodb')
 
+    items_to_export = []
+
     for c_name, sets in data.items():
         for set_name, card in sets.items():
-            export_dynamodb(dynamodb_client, card, object_key)
+            if len(card["multiverse_ids"]) != 1:
+                print(f"No multiverse id for card: {card['name']} - {card['set_name']}")
+                return
+            items_to_export.append(
+                {
+                    "multiverse_id": {"S": str(card["multiverse_ids"][0])},
+                    "date": {"S": object_key.split("_")[-1].split(".")[0]},
+                    "set": {"S": card["set"]},
+                    "set_name": {"S": card["set_name"]},
+                    "usd": {"S": default_to_string(card["prices"]["usd"])},
+                    "usd_foil": {"S": default_to_string(card["prices"]["usd_foil"])},
+                    "eur": {"S": default_to_string(card["prices"]["eur"])},
+                    "eur_foil": {"S": default_to_string(card["prices"]["eur_foil"])},
+                    "usd_etched": {"S": default_to_string(card["prices"]["usd_etched"])},
+                }
+            )
+    items_to_export = chunk_list(items_to_export, 25)
+    for chunk in items_to_export:
+        dynamodb_client.put_item(
+            TableName="pricing_data",
+            Items=chunk
+        )
