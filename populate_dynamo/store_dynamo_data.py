@@ -44,7 +44,7 @@ def handle_event(event, context):
         for set_name, card in sets.items():
             if len(card["multiverse_ids"]) != 1:
                 print(f"No multiverse id for card: {card['name']} - {card['set_name']}")
-                return
+                continue
             i += 1
             items_to_export.append(
                 {
@@ -68,9 +68,10 @@ def handle_event(event, context):
     print(f"Sending chunks")
     for i, chunk in enumerate(items_to_export):
         print(f"Sending chunk number: {i}")
-        dynamodb_client.batch_write_item(
+        resp = dynamodb_client.batch_write_item(
             RequestItem={
                 "pricing_data": chunk
             }
         )
+
         print("Success for chunk")
