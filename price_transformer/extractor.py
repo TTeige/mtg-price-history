@@ -31,7 +31,7 @@ def extract_data(event=None, context=None):
     for c in data:
         if c["legalities"]["commander"] == "not_legal":
             continue
-        if c["prices"]["usd"] is None:
+        if c["prices"]["usd"] is None or len(c["multiverse_ids"]) == 0:
             continue
         price_data[c["name"]][c["set"]] = build_new_price_object(c)
 

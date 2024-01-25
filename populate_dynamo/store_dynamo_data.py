@@ -43,7 +43,6 @@ def handle_event(event, context):
     for c_name, sets in data.items():
         for set_name, card in sets.items():
             if len(card["multiverse_ids"]) != 1:
-                print(f"No multiverse id for card: {card['name']} - {card['set_name']}")
                 continue
             i += 1
             items_to_export.append(
