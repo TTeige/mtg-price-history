@@ -1,4 +1,5 @@
 import json
+import logging
 from collections import defaultdict
 
 from boto3 import client
@@ -14,9 +15,13 @@ def build_new_price_object(c):
         "purchase_uris": c["purchase_uris"]
     }
 
+s3_client = client("s3")
 
-def extract_data(event=None, context=None):
-    print("Starting price data extraction")
+logger = logging.getLogger()
+logger.setLevel("INFO")
+
+def lambda_handler(event=None, context=None):
+    logger.info("Starting price data extraction")
     price_data = defaultdict(dict)  # Key is card_name and data is array of full objects as cards
     object_key = None
     print(f"Received event with {len(event['Records'])} number of records")
@@ -25,8 +30,7 @@ def extract_data(event=None, context=None):
     if object_key is None:
         return
 
-    print(f"Processing object {object_key}")
-    s3_client = client("s3")
+    logger.info(f"Processing object {object_key}")
     resp = s3_client.get_object(Bucket="mtg-pricing-data", Key=object_key)
 
     data = json.load(resp["Body"])
@@ -40,7 +44,7 @@ def extract_data(event=None, context=None):
     f_out_date_string = object_key.split("-")[-1].split(".")[0]
     year, month, day, hour = f_out_date_string[0:4], f_out_date_string[4:6], f_out_date_string[6:8], f_out_date_string[
                                                                                                      8:10]
-    print(f"Found {len(price_data.keys())} number of cards")
+    logger.info(f"Found {len(price_data.keys())} number of cards")
     f_out = f"prices/price_data_{year}-{month}-{day}-{hour}.json"
 
     s3_client.put_object(
