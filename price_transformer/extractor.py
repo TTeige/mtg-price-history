@@ -4,6 +4,12 @@ from collections import defaultdict
 
 from boto3 import client
 
+s3_client = client("s3")
+
+logger = logging.getLogger()
+logger.setLevel("INFO")
+logger.info("Initialized extractor module")
+
 
 def build_new_price_object(c):
     return {
@@ -15,10 +21,6 @@ def build_new_price_object(c):
         "purchase_uris": c["purchase_uris"]
     }
 
-s3_client = client("s3")
-
-logger = logging.getLogger()
-logger.setLevel("INFO")
 
 def lambda_handler(event=None, context=None):
     logger.info("Starting price data extraction")
