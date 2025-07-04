@@ -45,7 +45,7 @@ jobs:
           cd package 
           zip -r ../price_transformer.zip . 
           cd .. 
-          zip price_transformer.zip price_transformerπ.py
+          zip price_transformer.zip price_transformer.py
           cd ..
       - name: Create dynamo population lambda
         run: |
