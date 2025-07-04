@@ -47,7 +47,7 @@ jobs:
           cd .. 
           zip price_transformer.zip extractor.py
           cd ..
-      - name: Create price transformer lambda
+      - name: Create dynamo population lambda
         run: |
           cd populate_dynamo 
           mkdir package 

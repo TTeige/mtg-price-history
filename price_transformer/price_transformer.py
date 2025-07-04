@@ -54,8 +54,3 @@ def lambda_handler(event=None, context=None):
     )
 
     return f_out
-
-
-if __name__ == '__main__':
-    f_name = "raw_card_data/default-cards-20240118100432.json"
-    extract_data()
