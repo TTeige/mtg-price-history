@@ -16,6 +16,7 @@ def build_new_price_object(c):
 
 
 def extract_data(event=None, context=None):
+    print("Starting price data extraction")
     price_data = defaultdict(dict)  # Key is card_name and data is array of full objects as cards
     object_key = None
     print(f"Received event with {len(event['Records'])} number of records")
@@ -24,14 +25,15 @@ def extract_data(event=None, context=None):
     if object_key is None:
         return
 
+    print(f"Processing object {object_key}")
     s3_client = client("s3")
     resp = s3_client.get_object(Bucket="mtg-pricing-data", Key=object_key)
 
     data = json.load(resp["Body"])
     for c in data:
-        if c["legalities"]["commander"] == "not_legal":
-            continue
         if c["prices"]["usd"] is None or len(c["multiverse_ids"]) == 0:
+            continue
+        if c["prices"]["eur"] is None or len(c["multiverse_ids"]) == 0:
             continue
         price_data[c["name"]][c["set"]] = build_new_price_object(c)
 
