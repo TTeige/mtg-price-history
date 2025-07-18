@@ -1,12 +1,16 @@
 import json
 import os
 import logging
+from collections import defaultdict
 
 from boto3 import client
 
 import requests
 
+local = os.getenv("local")
+
 logger = logging.getLogger()
+
 
 def fetch_card_data():
     base_url = "https://api.scryfall.com"
@@ -28,7 +32,6 @@ def fetch_card_data():
     fp = f"raw-data/{download_uri.split('/')[-1]}"
 
     data = resp.json()
-    local = os.getenv("local")
 
     if local is None and not local:
         logger.info("Writing to s3")
@@ -45,6 +48,7 @@ def fetch_card_data():
 
     return fp
 
+
 def build_new_price_object(c):
     return {
         "multiverse_ids": c["multiverse_ids"],
@@ -57,7 +61,7 @@ def build_new_price_object(c):
 
 
 def transform_card_data(data, s3_client, file_name):
-    price_data = {}
+    price_data = defaultdict(dict)
     logger.info("Transforming card data")
     for c in data:
         if c["prices"]["usd"] is None or len(c["multiverse_ids"]) == 0:
@@ -72,9 +76,14 @@ def transform_card_data(data, s3_client, file_name):
     logger.info(f"Found {len(price_data.keys())} number of cards")
     f_out = f"prices/price_data_{year}-{month}-{day}-{hour}.json"
 
-    s3_client.put_object(
-        Body=json.dumps(price_data), Bucket="mtg-pricing-data", Key=f_out
-    )
+    if local is None and not local:
+        s3_client.put_object(
+            Body=json.dumps(price_data), Bucket="mtg-pricing-data", Key=f_out
+        )
+        logger.info(price_data)
+
+    else:
+        logger.info(price_data)
 
 
 if __name__ == '__main__':
