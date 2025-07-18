@@ -32,7 +32,7 @@ jobs:
           REPOSITORY: mtg-pricing
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          cd raw_data_loader
+          cd data_etl
           docker build -t $REGISTRY/$REPOSITORY:latest .
           docker push $REGISTRY/$REPOSITORY:latest
           cd ..
