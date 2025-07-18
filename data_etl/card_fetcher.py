@@ -10,6 +10,7 @@ import requests
 local = os.getenv("local")
 
 logger = logging.getLogger()
+logging.basicConfig(level=logging.INFO)
 
 
 def fetch_card_data():
