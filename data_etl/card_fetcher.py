@@ -27,19 +27,21 @@ def fetch_card_data():
     logger.info("File downloaded")
     fp = f"raw-data/{download_uri.split('/')[-1]}"
 
+    data = resp.json()
     local = os.getenv("local")
 
     if local is None and not local:
         logger.info("Writing to s3")
         s3_client = client("s3")
-        resp = s3_client.put_object(Body=json.dumps(resp.json()), Bucket="mtg-pricing-data", Key=fp)
+
+        s3_client.put_object(Body=json.dumps(data), Bucket="mtg-pricing-data", Key=fp)
         logger.info("Completed writing raw data to S3")
 
-        transform_card_data(resp.json(), s3_client, fp)
+        transform_card_data(data, s3_client, fp)
     else:
         logger.info("Writing to disk")
         with open(f"../{fp}", "w") as f:
-            json.dump(resp.json(), f)
+            json.dump(data, f)
 
     return fp
 
