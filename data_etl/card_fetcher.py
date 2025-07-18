@@ -56,7 +56,8 @@ def build_new_price_object(c):
         "set": c["set"],
         "set_name": c["set_name"],
         "prices": c["prices"],
-        "purchase_uris": c["purchase_uris"]
+        "purchase_uris": c["purchase_uris"],
+        "image_uri": c["image_uris"]["normal"] if "image_uris" in c else None,
     }
 
 
