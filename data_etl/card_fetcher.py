@@ -80,8 +80,6 @@ def transform_card_data(data, s3_client, file_name):
         s3_client.put_object(
             Body=json.dumps(price_data), Bucket="mtg-pricing-data", Key=f_out
         )
-        logger.info(price_data)
-
     else:
         logger.info(price_data)
 
