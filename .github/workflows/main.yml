@@ -36,29 +36,3 @@ jobs:
           docker build -t $REGISTRY/$REPOSITORY:latest .
           docker push $REGISTRY/$REPOSITORY:latest
           cd ..
-
-      - name: Create price transformer lambda
-        run: |
-          cd price_transformer 
-          mkdir package 
-          pip install --target ./package -r requirements.txt 
-          cd package 
-          zip -r ../price_transformer.zip . 
-          cd .. 
-          zip price_transformer.zip price_transformer.py
-          cd ..
-      - name: Create dynamo population lambda
-        run: |
-          cd populate_dynamo 
-          mkdir package 
-          pip install --target ./package -r requirements.txt 
-          cd package 
-          zip -r ../dynamo.zip . 
-          cd .. 
-          zip dynamo.zip store_dynamo_data.py
-          cd ..
-
-      - name: Deploy price transformer lambda
-        run: |
-          aws lambda update-function-code --function-name TransformPriceData --zip-file fileb://price_transformer/price_transformer.zip
-          aws lambda update-function-code --function-name TransferToDynamo --zip-file fileb://populate_dynamo/dynamo.zip
