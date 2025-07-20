@@ -26,19 +26,7 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Check for changes in data_etl
-        id: dataetl_changed
-        run: |
-          git fetch origin master
-          CHANGED=$(git diff --name-only origin/master ${{ github.sha }} | grep -E '^data_etl/' || true)
-          if [ -n "$CHANGED" ]; then
-            echo "changed=true" >> $GITHUB_OUTPUT
-          else
-            echo "changed=false" >> $GITHUB_OUTPUT
-          fi
-
       - name: Build and deploy
-        if: steps.dataetl_changed.outputs.changed == 'true'
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           REPOSITORY: mtg-pricing
@@ -49,19 +37,7 @@ jobs:
           docker push $REGISTRY/$REPOSITORY:latest
           cd ..
 
-      - name: Check for changes in card-search
-        id: cardsearch_changed
-        run: |
-          git fetch origin master
-          CHANGED=$(git diff --name-only origin/master ${{ github.sha }} | grep -E '^card-search/' || true)
-          if [ -n "$CHANGED" ]; then
-            echo "changed=true" >> $GITHUB_OUTPUT
-          else
-            echo "changed=false" >> $GITHUB_OUTPUT
-          fi
-
       - name: Build and deploy card-search
-        if: steps.cardsearch_changed.outputs.changed == 'true'
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           REPOSITORY: mtg-pricing-search
