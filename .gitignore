@@ -4,3 +4,5 @@ raw-data/
 transformed_card_data/
 venv/
 /single.json
+terraform/.terraform
+terraform/terraform.tfstate
