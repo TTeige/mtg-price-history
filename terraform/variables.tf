@@ -33,3 +33,9 @@ variable "hosted_zone_id" {
   type        = string
   default     = "Z09898711AWW9CPXXN7HQ"
 }
+
+variable "acm_certificate_arn" {
+  description = "ARN of the ACM certificate for HTTPS listener"
+  type        = string
+  default     = "arn:aws:acm:eu-north-1:115780940165:certificate/e2fb7aaf-08f8-4c15-b8a4-975d072754b1"
+}

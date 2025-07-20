@@ -70,7 +70,7 @@ resource "aws_ecs_task_definition" "card_search" {
       portMappings = [
         {
           containerPort = var.container_port
-          hostPort      = var.container_port
+          hostPort      = var.80
           protocol      = "tcp"
         }
       ]
@@ -84,8 +84,15 @@ resource "aws_security_group" "ecs_service_sg" {
   vpc_id      = aws_vpc.main.id
 
   ingress {
-    from_port   = var.container_port
-    to_port     = var.container_port
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 443
+    to_port     = 443
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -138,6 +145,16 @@ resource "aws_route_table_association" "main" {
   route_table_id = aws_route_table.main.id
 }
 
+resource "aws_route_table_association" "secondary" {
+  subnet_id      = aws_subnet.secondary.id
+  route_table_id = aws_route_table.main.id
+}
+
+resource "aws_route_table_association" "tertiary" {
+  subnet_id      = aws_subnet.tertiary.id
+  route_table_id = aws_route_table.main.id
+}
+
 resource "aws_lb" "main" {
   name               = "card-search-alb"
   internal           = false
@@ -167,6 +184,18 @@ resource "aws_lb_listener" "main" {
   load_balancer_arn = aws_lb.main.arn
   port              = 80
   protocol          = "HTTP"
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.main.arn
+  }
+}
+
+resource "aws_lb_listener" "https" {
+  load_balancer_arn = aws_lb.main.arn
+  port              = 443
+  protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-2016-08"
+  certificate_arn   = var.acm_certificate_arn
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.main.arn
