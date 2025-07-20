@@ -4,6 +4,8 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder
 import com.amazonaws.services.s3.model.S3Object
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import jakarta.annotation.PostConstruct
+import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import java.util.concurrent.ConcurrentHashMap
 
@@ -13,6 +15,23 @@ class CardDataService {
     private val objectMapper = jacksonObjectMapper()
     private val bucketName = "mtg-pricing-data"
     private val key = "prices/price_data_2025-07-17-09.json"
+
+    @PostConstruct
+    fun initCache() {
+        getCardData()
+    }
+
+    @Scheduled(cron = "0 0 12 * * *")
+    fun invalidateCacheMorning() {
+        cache.clear()
+        getCardData()
+    }
+
+    @Scheduled(cron = "0 0 0 * * *")
+    fun invalidateCacheEvening() {
+        cache.clear()
+        getCardData()
+    }
 
     private fun getLatestPriceFileKey(): String? {
         val s3Client = AmazonS3ClientBuilder.defaultClient()
@@ -35,4 +54,3 @@ class CardDataService {
         return cache
     }
 }
-
