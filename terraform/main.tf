@@ -57,7 +57,7 @@ resource "aws_ecs_task_definition" "card_search" {
   family                   = "card-search-task"
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
-  cpu                      = "0.25"
+  cpu                      = "256"
   memory                   = "1024"
   execution_role_arn       = aws_iam_role.ecs_task_execution.arn
   task_role_arn            = aws_iam_role.ecs_task_role.arn
@@ -108,6 +108,18 @@ resource "aws_subnet" "main" {
   availability_zone       = "${var.aws_region}a"
 }
 
+resource "aws_subnet" "secondary" {
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = "10.0.2.0/24"
+  availability_zone       = "${var.aws_region}b"
+}
+
+resource "aws_subnet" "tertiary" {
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = "10.0.3.0/24"
+  availability_zone       = "${var.aws_region}c"
+}
+
 resource "aws_internet_gateway" "main" {
   vpc_id = aws_vpc.main.id
 }
@@ -131,7 +143,7 @@ resource "aws_lb" "main" {
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.ecs_service_sg.id]
-  subnets            = [aws_subnet.main.id]
+  subnets            = [aws_subnet.main.id, aws_subnet.secondary.id, aws_subnet.tertiary.id]
 }
 
 resource "aws_lb_target_group" "main" {
