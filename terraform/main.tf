@@ -70,7 +70,7 @@ resource "aws_ecs_task_definition" "card_search" {
       portMappings = [
         {
           containerPort = var.container_port
-          hostPort      = var.80
+          hostPort      = var.container_port
           protocol      = "tcp"
         }
       ]
@@ -85,14 +85,14 @@ resource "aws_security_group" "ecs_service_sg" {
 
   ingress {
     from_port   = 80
-    to_port     = 80
+    to_port     = var.container_port
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
   ingress {
     from_port   = 443
-    to_port     = 443
+    to_port     = var.container_port
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
