@@ -36,3 +36,15 @@ jobs:
           docker build -t $REGISTRY/$REPOSITORY:latest .
           docker push $REGISTRY/$REPOSITORY:latest
           cd ..
+
+      - name: Build and deploy card-search
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REPOSITORY: mtg-pricing-search
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          cd card-search
+          ./gradlew build
+          docker build -t $REGISTRY/$REPOSITORY:latest .
+          docker push $REGISTRY/$REPOSITORY:latest
+          cd ..
