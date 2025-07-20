@@ -10,7 +10,6 @@ jobs:
     name: Deploy
     runs-on: ubuntu-latest
     environment: production
-    needs: terraform-deploy
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -48,30 +47,3 @@ jobs:
           docker build -t $REGISTRY/$REPOSITORY:latest .
           docker push $REGISTRY/$REPOSITORY:latest
           cd ..
-
-  terraform-deploy:
-    name: Terraform Deploy
-    runs-on: ubuntu-latest
-    environment: production
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: eu-north-1
-
-      - name: Install Terraform
-        uses: hashicorp/setup-terraform@v3
-
-      - name: Terraform Init
-        run: terraform -chdir=terraform init
-
-      - name: Terraform Plan
-        run: terraform -chdir=terraform plan
-
-      - name: Terraform Apply
-        run: terraform -chdir=terraform apply -auto-approve

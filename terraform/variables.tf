@@ -31,5 +31,5 @@ variable "domain_name" {
 variable "hosted_zone_id" {
   description = "Route53 hosted zone ID for the domain"
   type        = string
-    default     = "Z027906936FX6S14YVXDE"
+  default     = "Z09898711AWW9CPXXN7HQ"
 }
