@@ -25,7 +25,7 @@ variable "container_port" {
 variable "domain_name" {
   description = "Domain name to use for the ECS service"
   type        = string
-  default     = "mtg-trade.timteige.com"
+  default     = "api.timteige.com"
 }
 
 variable "hosted_zone_id" {
