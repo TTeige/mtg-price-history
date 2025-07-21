@@ -17,5 +17,9 @@ data class CardPriceObject(
     @JsonProperty("purchase_uris")
     val purchaseUris: Map<String, String>,
     @JsonProperty("image_uri")
-    val imageUri: String?
+    val imageUri: String?,
+    @JsonProperty("scryfall_id")
+    val scryfallId: String,
+    @JsonProperty("cardmarket_id")
+    val cardmarketId: String? = null,
 )
