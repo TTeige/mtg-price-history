@@ -68,8 +68,6 @@ def transform_card_data(data, s3_client, file_name):
     price_data = defaultdict(dict)
     logger.info("Transforming card data")
     for c in data:
-        if c["prices"]["usd"] is None or c["prices"]["eur"] is None:
-            continue
         if c["oversized"] is True:
             continue
         if "games" not in c:
