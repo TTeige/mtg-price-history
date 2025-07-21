@@ -1,4 +1,4 @@
-package no.tim.cardsearch
+package no.tim.cardsearch.search
 
 import com.fasterxml.jackson.annotation.JsonProperty
 

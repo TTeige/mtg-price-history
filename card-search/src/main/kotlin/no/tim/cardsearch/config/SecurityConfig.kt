@@ -1,4 +1,4 @@
-package no.tim.cardsearch
+package no.tim.cardsearch.config
 
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean

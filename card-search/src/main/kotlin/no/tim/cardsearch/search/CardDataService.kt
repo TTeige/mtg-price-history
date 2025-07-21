@@ -1,4 +1,4 @@
-package no.tim.cardsearch
+package no.tim.cardsearch.search
 
 import com.amazonaws.services.s3.AmazonS3ClientBuilder
 import com.amazonaws.services.s3.model.S3Object
@@ -48,7 +48,7 @@ class CardDataService {
             val s3Object: S3Object = s3Client.getObject(bucketName, latestKey)
             val json = s3Object.objectContent.bufferedReader().use { it.readText() }
             val data: Map<String, Map<String, CardPriceObject>> = objectMapper.readValue(json,
-                object: TypeReference<Map<String, Map<String, CardPriceObject>>>() { }
+                object: com.fasterxml.jackson.core.type.TypeReference<Map<String, Map<String, CardPriceObject>>>() { }
             )
             cache.putAll(data)
             normalizedNameCache.clear()

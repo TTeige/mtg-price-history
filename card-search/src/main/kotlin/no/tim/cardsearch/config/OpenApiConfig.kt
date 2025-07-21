@@ -1,4 +1,4 @@
-package no.tim.cardsearch
+package no.tim.cardsearch.config
 
 import io.swagger.v3.oas.models.info.Info
 import org.springdoc.core.models.GroupedOpenApi
