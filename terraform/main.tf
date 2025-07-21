@@ -170,7 +170,7 @@ resource "aws_lb_target_group" "main" {
   vpc_id   = aws_vpc.main.id
   target_type = "ip"
   health_check {
-    path                = "/health"
+    path                = "/actuator/health"
     protocol            = "HTTP"
     matcher             = "200"
     interval            = 30

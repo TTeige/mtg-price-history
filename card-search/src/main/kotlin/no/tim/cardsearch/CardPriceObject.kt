@@ -13,7 +13,7 @@ data class CardPriceObject(
     @JsonProperty("set_name")
     val setName: String,
     @JsonProperty("prices")
-    val prices: Map<String, Map<String, String?>>,
+    val prices: Map<String, String?>,
     @JsonProperty("purchase_uris")
     val purchaseUris: Map<String, String>,
     @JsonProperty("image_uri")
