@@ -64,6 +64,24 @@ def build_new_price_object(c):
     }
 
 
+def validate_card_data(c):
+    if "name" not in c or not c["name"]:
+        logger.warning("Card data missing name")
+        return False
+    if "set" not in c or not c["set"]:
+        logger.warning("Card data missing set")
+        return False
+    if "prices" not in c or not isinstance(c["prices"], dict):
+        logger.warning("Card data missing prices")
+        return False
+    if "image_uris" not in c or "normal" not in c["image_uris"]:
+        logger.warning("Card data missing image URI")
+        return False
+    if "purchase_uris" not in c :
+        logger.warning("Card data missing purchase URIs")
+        return False
+    return True
+
 def transform_card_data(data, s3_client, file_name):
     price_data = defaultdict(dict)
     logger.info("Transforming card data")
@@ -73,6 +91,8 @@ def transform_card_data(data, s3_client, file_name):
         if "games" not in c:
             continue
         if "paper" not in c["games"]:
+            continue
+        if not validate_card_data(c):
             continue
         price_data[c["name"]][c["set"]] = build_new_price_object(c)
 
