@@ -53,6 +53,11 @@ resource "aws_iam_role_policy" "ecs_task_s3_inline" {
   })
 }
 
+resource "aws_cloudwatch_log_group" "ecs_card_search" {
+  name              = "/ecs/card-search"
+  retention_in_days = 14
+}
+
 resource "aws_ecs_task_definition" "card_search" {
   family                   = "card-search-task"
   network_mode             = "awsvpc"
@@ -67,6 +72,13 @@ resource "aws_ecs_task_definition" "card_search" {
       name      = var.container_name
       image     = var.ecr_repository_url
       essential = true
+      healthCheck = {
+        command     = ["CMD-SHELL", "curl -f http://localhost:8080/actuator/health || exit 1"]
+        interval    = 30
+        timeout     = 5
+        retries     = 3
+        startPeriod = 20
+      }
       portMappings = [
         {
           containerPort = var.container_port
@@ -74,6 +86,14 @@ resource "aws_ecs_task_definition" "card_search" {
           protocol      = "tcp"
         }
       ]
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          awslogs-group         = aws_cloudwatch_log_group.ecs_card_search.name
+          awslogs-region        = var.aws_region
+          awslogs-stream-prefix = "ecs"
+        }
+      }
     }
   ])
 }
@@ -176,7 +196,7 @@ resource "aws_lb_target_group" "main" {
     interval            = 30
     timeout             = 5
     healthy_threshold   = 2
-    unhealthy_threshold = 2
+    unhealthy_threshold = 10
   }
 }
 
@@ -221,8 +241,14 @@ resource "aws_ecs_service" "card_search" {
   launch_type     = "FARGATE"
 
   network_configuration {
-    subnets          = [aws_subnet.main.id]
+    subnets          = [aws_subnet.main.id, aws_subnet.secondary.id, aws_subnet.tertiary.id]
     security_groups  = [aws_security_group.ecs_service_sg.id]
     assign_public_ip = true
+  }
+
+  load_balancer {
+    target_group_arn = aws_lb_target_group.main.arn
+    container_name   = var.container_name
+    container_port   = var.container_port
   }
 }
