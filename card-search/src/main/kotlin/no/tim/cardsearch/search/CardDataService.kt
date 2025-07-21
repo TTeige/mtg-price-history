@@ -14,7 +14,6 @@ class CardDataService {
     private val cache = ConcurrentHashMap<String, Map<String, CardPriceObject>>()
     private val objectMapper = jacksonObjectMapper()
     private val bucketName = "mtg-pricing-data"
-    private val key = "prices/price_data_2025-07-17-09.json"
     private val normalizedNameCache: MutableList<NameEntry> = mutableListOf()
 
     @PostConstruct
@@ -44,11 +43,11 @@ class CardDataService {
     fun buildCardCaches(): Map<String, Map<String, CardPriceObject>> {
         if (cache.isEmpty()) {
             val s3Client = AmazonS3ClientBuilder.defaultClient()
-            val latestKey = getLatestPriceFileKey() ?: key
+            val latestKey = getLatestPriceFileKey()
             val s3Object: S3Object = s3Client.getObject(bucketName, latestKey)
             val json = s3Object.objectContent.bufferedReader().use { it.readText() }
             val data: Map<String, Map<String, CardPriceObject>> = objectMapper.readValue(json,
-                object: com.fasterxml.jackson.core.type.TypeReference<Map<String, Map<String, CardPriceObject>>>() { }
+                object: TypeReference<Map<String, Map<String, CardPriceObject>>>() { }
             )
             cache.putAll(data)
             normalizedNameCache.clear()

@@ -66,19 +66,14 @@ def build_new_price_object(c):
 
 def validate_card_data(c):
     if "name" not in c or not c["name"]:
-        logger.warning("Card data missing name")
         return False
     if "set" not in c or not c["set"]:
-        logger.warning("Card data missing set")
         return False
     if "prices" not in c or not isinstance(c["prices"], dict):
-        logger.warning("Card data missing prices")
         return False
     if "image_uris" not in c or "normal" not in c["image_uris"]:
-        logger.warning("Card data missing image URI")
         return False
     if "purchase_uris" not in c :
-        logger.warning("Card data missing purchase URIs")
         return False
     return True
 
