@@ -15,6 +15,7 @@ class CardDataService {
     private val objectMapper = jacksonObjectMapper()
     private val bucketName = "mtg-pricing-data"
     private val key = "prices/price_data_2025-07-17-09.json"
+    private val nameCache: MutableSet<String> = mutableSetOf()
 
     @PostConstruct
     fun initCache() {
@@ -50,7 +51,16 @@ class CardDataService {
                 object: TypeReference<Map<String, Map<String, CardPriceObject>>>() { }
             )
             cache.putAll(data)
+            nameCache.clear()
+            nameCache.addAll(data.keys)
         }
         return cache
+    }
+
+    fun getCardNames(): Set<String> {
+        if (nameCache.isEmpty()) {
+            getCardData() // This will populate nameCache as well
+        }
+        return nameCache
     }
 }

@@ -12,12 +12,17 @@ class SearchController(
 ) {
 
     @GetMapping("")
-    fun searchCards(@RequestParam query: String): Map<String, Map<String, CardPriceObject>> {
-        val cardData = cardDataService.getCardData()
-        // Normalize query and keys: remove special characters and compare case-insensitive
+    fun searchCards(
+        @RequestParam query: String,
+        @RequestParam(required = false, defaultValue = "20") limit: Int,
+        @RequestParam(required = false, defaultValue = "0") page: Int
+    ): List<String> {
+        val cardData = cardDataService.getCardNames()
         val normalizedQuery = query.replace(Regex("[^A-Za-z0-9 ]"), "").lowercase()
-        return cardData.filterKeys {
+        val filtered = cardData.filter {
             it.replace(Regex("[^A-Za-z0-9 ]"), "").lowercase().contains(normalizedQuery)
         }
+        val paged = filtered.drop(page * limit).take(limit)
+        return paged
     }
 }
