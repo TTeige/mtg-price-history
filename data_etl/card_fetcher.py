@@ -59,6 +59,8 @@ def build_new_price_object(c):
         "prices": c["prices"],
         "purchase_uris": c["purchase_uris"],
         "image_uri": c["image_uris"]["normal"] if "image_uris" in c else None,
+        "scryfall_id": c["id"],
+        "cardmarket_id": c["cardmarket_id"] if "cardmarket_id" in c else None,
     }
 
 
@@ -66,9 +68,13 @@ def transform_card_data(data, s3_client, file_name):
     price_data = defaultdict(dict)
     logger.info("Transforming card data")
     for c in data:
-        if c["prices"]["usd"] is None or len(c["multiverse_ids"]) == 0:
+        if c["prices"]["usd"] is None or c["prices"]["eur"] is None:
             continue
-        if c["prices"]["eur"] is None or len(c["multiverse_ids"]) == 0:
+        if c["oversized"] is True:
+            continue
+        if "games" not in c:
+            continue
+        if "paper" not in c["games"]:
             continue
         price_data[c["name"]][c["set"]] = build_new_price_object(c)
 
