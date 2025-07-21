@@ -17,12 +17,18 @@ class SearchController(
         @RequestParam(required = false, defaultValue = "20") limit: Int,
         @RequestParam(required = false, defaultValue = "0") page: Int
     ): List<String> {
-        val cardData = cardDataService.getCardNames()
         val normalizedQuery = query.replace(Regex("[^A-Za-z0-9 ]"), "").lowercase()
-        val filtered = cardData.filter {
-            it.replace(Regex("[^A-Za-z0-9 ]"), "").lowercase().contains(normalizedQuery)
-        }
-        val paged = filtered.drop(page * limit).take(limit)
-        return paged
+        val nameEntries = cardDataService.getNormalizedNameEntries()
+        val prioritized = nameEntries
+            .filter { it.normalized.contains(normalizedQuery) }
+            .sortedWith(compareBy(
+                { entry ->
+                    val idx = entry.words.indexOfFirst { word -> word.startsWith(normalizedQuery) }
+                    if (idx == -1) Int.MAX_VALUE else idx
+                },
+                { entry -> entry.original }
+            ))
+        val paged = prioritized.drop(page * limit).take(limit)
+        return paged.map { it.original }
     }
 }

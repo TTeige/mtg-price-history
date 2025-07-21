@@ -15,23 +15,23 @@ class CardDataService {
     private val objectMapper = jacksonObjectMapper()
     private val bucketName = "mtg-pricing-data"
     private val key = "prices/price_data_2025-07-17-09.json"
-    private val nameCache: MutableSet<String> = mutableSetOf()
+    private val normalizedNameCache: MutableList<NameEntry> = mutableListOf()
 
     @PostConstruct
     fun initCache() {
-        getCardData()
+        buildCardCaches()
     }
 
     @Scheduled(cron = "0 0 12 * * *")
     fun invalidateCacheMorning() {
         cache.clear()
-        getCardData()
+        buildCardCaches()
     }
 
     @Scheduled(cron = "0 0 0 * * *")
     fun invalidateCacheEvening() {
         cache.clear()
-        getCardData()
+        buildCardCaches()
     }
 
     private fun getLatestPriceFileKey(): String? {
@@ -41,7 +41,7 @@ class CardDataService {
         return latest?.key
     }
 
-    fun getCardData(): Map<String, Map<String, CardPriceObject>> {
+    fun buildCardCaches(): Map<String, Map<String, CardPriceObject>> {
         if (cache.isEmpty()) {
             val s3Client = AmazonS3ClientBuilder.defaultClient()
             val latestKey = getLatestPriceFileKey() ?: key
@@ -51,16 +51,22 @@ class CardDataService {
                 object: TypeReference<Map<String, Map<String, CardPriceObject>>>() { }
             )
             cache.putAll(data)
-            nameCache.clear()
-            nameCache.addAll(data.keys)
+            normalizedNameCache.clear()
+            normalizedNameCache.addAll(data.keys.map { name ->
+                val normalized = name.replace(Regex("[^A-Za-z0-9 ]"), "").lowercase()
+                val words = name.split(" ").map { it.replace(Regex("[^A-Za-z0-9]"), "").lowercase() }
+                NameEntry(name, normalized, words)
+            })
         }
         return cache
     }
 
-    fun getCardNames(): Set<String> {
-        if (nameCache.isEmpty()) {
-            getCardData() // This will populate nameCache as well
+    fun getNormalizedNameEntries(): List<NameEntry> {
+        if (normalizedNameCache.isEmpty()) {
+            buildCardCaches() // This will populate normalizedNameCache as well
         }
-        return nameCache
+        return normalizedNameCache
     }
+
+    data class NameEntry(val original: String, val normalized: String, val words: List<String>)
 }
