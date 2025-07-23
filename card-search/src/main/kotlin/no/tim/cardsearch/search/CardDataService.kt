@@ -33,6 +33,13 @@ class CardDataService {
         buildCardCaches()
     }
 
+    fun getPriceData(cardName: String): Map<String, CardPriceObject>? {
+        if (cache.isEmpty()) {
+            buildCardCaches()
+        }
+        return cache[cardName]
+    }
+
     private fun getLatestPriceFileKey(): String? {
         val s3Client = AmazonS3ClientBuilder.defaultClient()
         val objects = s3Client.listObjects(bucketName, "prices/").objectSummaries

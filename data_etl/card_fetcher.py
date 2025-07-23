@@ -60,6 +60,7 @@ def build_new_price_object(c):
         "purchase_uris": c["purchase_uris"],
         "image_uri": c["image_uris"]["normal"] if "image_uris" in c else None,
         "scryfall_id": c["id"],
+        "collector_number": c["collector_number"],
         "cardmarket_id": c["cardmarket_id"] if "cardmarket_id" in c else None,
     }
 

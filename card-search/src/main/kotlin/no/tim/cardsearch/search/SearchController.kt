@@ -31,7 +31,7 @@ class SearchController(
         @RequestParam query: String,
         @RequestParam(required = false, defaultValue = "20") limit: Int,
         @RequestParam(required = false, defaultValue = "0") page: Int
-    ): List<String> {
+    ): Map<String, Map<String, CardPriceObject>?> {
         val normalizedQuery = query.replace(Regex("[^A-Za-z0-9 ]"), "").lowercase()
         val nameEntries = cardDataService.getNormalizedNameEntries()
         val maxDistance = 2
@@ -50,6 +50,6 @@ class SearchController(
                 { entry -> entry.original }
             ))
         val paged = prioritized.drop(page * limit).take(limit)
-        return paged.map { it.original }
+        return paged.map { it.original }.associateWith { cardDataService.getPriceData(it) }
     }
 }
