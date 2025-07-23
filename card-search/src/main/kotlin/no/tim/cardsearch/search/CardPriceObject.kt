@@ -22,4 +22,6 @@ data class CardPriceObject(
     val scryfallId: String,
     @JsonProperty("cardmarket_id")
     val cardmarketId: String? = null,
+    @JsonProperty("collector_number")
+    val collectorNumber: String? = null,
 )
