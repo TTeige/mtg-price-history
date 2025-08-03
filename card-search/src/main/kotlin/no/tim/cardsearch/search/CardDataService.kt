@@ -53,16 +53,10 @@ class CardDataService {
         val latestKey = getLatestPriceFileKey()
         val s3Object: S3Object = s3Client.getObject(bucketName, latestKey)
         val json = s3Object.objectContent.bufferedReader().use { it.readText() }
-        val data: Map<String, Map<String, CardPriceObject>> = objectMapper.readValue(json,
-            object: TypeReference<Map<String, Map<String, CardPriceObject>>>() { }
+        val data: Map<String, Map<String, Map<String, CardPriceObject>>> = objectMapper.readValue(json,
+            object: TypeReference<Map<String, Map<String, Map<String, CardPriceObject>>>>() { }
         )
         cache.clear()
-        data.forEach { (cardName, setMap) ->
-            cache[cardName] = setMap.values.groupBy { it.set }
-                .mapValues { entry ->
-                    entry.value.associateBy { it.collectorNumber ?: "" }
-                }
-        }
         normalizedNameCache.clear()
         normalizedNameCache.addAll(data.keys.map { name ->
             val normalized = name.replace(Regex("[^A-Za-z0-9 ]"), "").lowercase()

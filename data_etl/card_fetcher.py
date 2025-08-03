@@ -79,7 +79,7 @@ def validate_card_data(c):
     return True
 
 def transform_card_data(data, s3_client, file_name):
-    price_data = defaultdict(dict)
+    price_data = defaultdict(lambda: defaultdict(dict))
     logger.info("Transforming card data")
     for c in data:
         if c["oversized"] is True:
