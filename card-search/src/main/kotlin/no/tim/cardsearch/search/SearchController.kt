@@ -31,7 +31,7 @@ class SearchController(
         @RequestParam query: String,
         @RequestParam(required = false, defaultValue = "20") limit: Int,
         @RequestParam(required = false, defaultValue = "0") page: Int
-    ): Map<String, Map<String, CardPriceObject>?> {
+    ): Map<String, Map<String, Map<String, CardPriceObject>>?> {
         val normalizedQuery = query.replace(Regex("[^A-Za-z0-9 ]"), "").lowercase()
         val nameEntries = cardDataService.getNormalizedNameEntries()
         val maxDistance = 2

@@ -8,10 +8,11 @@ import jakarta.annotation.PostConstruct
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.collections.forEach
 
 @Service
 class CardDataService {
-    private val cache = ConcurrentHashMap<String, Map<String, CardPriceObject>>()
+    private val cache = ConcurrentHashMap<String, Map<String, Map<String, CardPriceObject>>>()
     private val objectMapper = jacksonObjectMapper()
     private val bucketName = "mtg-pricing-data"
     private val normalizedNameCache: MutableList<NameEntry> = mutableListOf()
@@ -33,7 +34,7 @@ class CardDataService {
         buildCardCaches()
     }
 
-    fun getPriceData(cardName: String): Map<String, CardPriceObject>? {
+    fun getPriceData(cardName: String): Map<String, Map<String, CardPriceObject>>? {
         if (cache.isEmpty()) {
             buildCardCaches()
         }
@@ -47,23 +48,27 @@ class CardDataService {
         return latest?.key
     }
 
-    fun buildCardCaches(): Map<String, Map<String, CardPriceObject>> {
-        if (cache.isEmpty()) {
-            val s3Client = AmazonS3ClientBuilder.defaultClient()
-            val latestKey = getLatestPriceFileKey()
-            val s3Object: S3Object = s3Client.getObject(bucketName, latestKey)
-            val json = s3Object.objectContent.bufferedReader().use { it.readText() }
-            val data: Map<String, Map<String, CardPriceObject>> = objectMapper.readValue(json,
-                object: TypeReference<Map<String, Map<String, CardPriceObject>>>() { }
-            )
-            cache.putAll(data)
-            normalizedNameCache.clear()
-            normalizedNameCache.addAll(data.keys.map { name ->
-                val normalized = name.replace(Regex("[^A-Za-z0-9 ]"), "").lowercase()
-                val words = name.split(" ").map { it.replace(Regex("[^A-Za-z0-9]"), "").lowercase() }
-                NameEntry(name, normalized, words)
-            })
+    fun buildCardCaches(): Map<String, Map<String, Map<String, CardPriceObject>>> {
+        val s3Client = AmazonS3ClientBuilder.defaultClient()
+        val latestKey = getLatestPriceFileKey()
+        val s3Object: S3Object = s3Client.getObject(bucketName, latestKey)
+        val json = s3Object.objectContent.bufferedReader().use { it.readText() }
+        val data: Map<String, Map<String, CardPriceObject>> = objectMapper.readValue(json,
+            object: TypeReference<Map<String, Map<String, CardPriceObject>>>() { }
+        )
+        cache.clear()
+        data.forEach { (cardName, setMap) ->
+            cache[cardName] = setMap.values.groupBy { it.set }
+                .mapValues { entry ->
+                    entry.value.associateBy { it.collectorNumber ?: "" }
+                }
         }
+        normalizedNameCache.clear()
+        normalizedNameCache.addAll(data.keys.map { name ->
+            val normalized = name.replace(Regex("[^A-Za-z0-9 ]"), "").lowercase()
+            val words = name.split(" ").map { it.replace(Regex("[^A-Za-z0-9]"), "").lowercase() }
+            NameEntry(name, normalized, words)
+        })
         return cache
     }
 

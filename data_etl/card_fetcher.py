@@ -88,9 +88,11 @@ def transform_card_data(data, s3_client, file_name):
             continue
         if "paper" not in c["games"]:
             continue
+        if "collector_number" not in c:
+            continue
         if not validate_card_data(c):
             continue
-        price_data[c["name"]][c["set"]] = build_new_price_object(c)
+        price_data[c["name"]][c["set"]][c["collector_number"]] = build_new_price_object(c)
 
     f_out_date_string = file_name.split("-")[-1].split(".")[0]
     year, month, day, hour = f_out_date_string[0:4], f_out_date_string[4:6], f_out_date_string[6:8], f_out_date_string[
